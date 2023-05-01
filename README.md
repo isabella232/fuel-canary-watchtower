@@ -3,17 +3,17 @@ A tool to monitor both the Fuel and Ethereum chains and the bridge activities oc
 
 ## Project Layout
 <pre>
-├── <a href="./fuel_watcher.rs">fuel_watcher</a>: handles a thread that watches the Fuel chain
-│   ├── <a href="./fuel_watcher/fuel_chain.rs">fuel_chain</a>: reads basic data from the Fuel chain
-│   ├── <a href="./fuel_watcher/fungible_token_contract.rs">fungible_token_contract</a>: handles monitoring events related to the bridge fungible token contracts
-├── <a href="./ethereum_watcher.rs">ethereum_watcher</a>: handles a thread that watches the Ethereum chain
-│   ├── <a href="./ethereum_watcher/ethereum_chain.rs">ethereum_chain</a>: reads basic data from the Ethereum chain
-│   ├── <a href="./ethereum_watcher/state_contract.rs">state_contract</a>: handles interacting with and monitoring events from the Fuel chain state contract
-│   ├── <a href="./ethereum_watcher/portal_contract.rs">portal_contract</a>: handles interacting with and monitoring events from the Fuel message portal contract
-│   ├── <a href="./ethereum_watcher/gateway_contract.rs">gateway_contract</a>: handles interacting with and monitoring events from the ERC-20 gateway contract
-├── <a href="./ethereum_actions.rs">ethereum_actions</a>: handles interactions with the Ethereum chain (pausing contracts)
-├── <a href="./alerts.rs">alerts</a>: handles logging and pushing out info/alerts
-├── <a href="./config.rs">config</a>: reads configuration set in the watchtower_config.json file
+├── <a href="./src/fuel_watcher.rs">fuel_watcher</a>: handles a thread that watches the Fuel chain
+│   ├── <a href="./src/fuel_watcher/fuel_chain.rs">fuel_chain</a>: reads basic data from the Fuel chain
+│   ├── <a href="./src/fuel_watcher/fungible_token_contract.rs">fungible_token_contract</a>: handles monitoring events related to the bridge fungible token contracts
+├── <a href="./src/ethereum_watcher.rs">ethereum_watcher</a>: handles a thread that watches the Ethereum chain
+│   ├── <a href="./src/ethereum_watcher/ethereum_chain.rs">ethereum_chain</a>: reads basic data from the Ethereum chain
+│   ├── <a href="./src/ethereum_watcher/state_contract.rs">state_contract</a>: handles interacting with and monitoring events from the Fuel chain state contract
+│   ├── <a href="./src/ethereum_watcher/portal_contract.rs">portal_contract</a>: handles interacting with and monitoring events from the Fuel message portal contract
+│   ├── <a href="./src/ethereum_watcher/gateway_contract.rs">gateway_contract</a>: handles interacting with and monitoring events from the ERC-20 gateway contract
+├── <a href="./src/ethereum_actions.rs">ethereum_actions</a>: handles interactions with the Ethereum chain (pausing contracts)
+├── <a href="./src/alerts.rs">alerts</a>: handles logging and pushing out info/alerts
+├── <a href="./src/config.rs">config</a>: reads configuration set in the watchtower_config.json file
 </pre>
 
 ### Config File
