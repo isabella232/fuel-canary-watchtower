@@ -25,7 +25,6 @@ pub struct WatchtowerAlerts {
 }
 
 // TODO: buffer message alerts to avoid duplicates
-// TODO: set a timer on client startup so messages don't go out until a few minutes after start
 
 impl WatchtowerAlerts {
     pub fn new(config: &WatchtowerConfig) -> Result<Self> {

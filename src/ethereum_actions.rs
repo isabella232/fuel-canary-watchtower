@@ -1,6 +1,6 @@
 use crate::alerts::{AlertLevel, WatchtowerAlerts};
 use crate::config::WatchtowerConfig;
-use crate::ethereum_watcher::consensus_contract::ConsesnsusContract;
+use crate::ethereum_watcher::state_contract::StateContract;
 use crate::ethereum_watcher::gateway_contract::GatewayContract;
 use crate::ethereum_watcher::portal_contract::PortalContract;
 
@@ -14,7 +14,7 @@ pub static THREAD_CONNECTIONS_ERR: &str = "Connections to the ethereum actions t
 #[derive(Deserialize, Clone, PartialEq, Eq, Debug)]
 pub enum EthereumAction {
     None,
-    PauseConsensus,
+    PauseState,
     PauseGateway,
     PausePortal,
     PauseAll,
@@ -36,7 +36,7 @@ impl WatchtowerEthereumActions {
         }
 
         // setup contracts
-        let consensus_contract = ConsesnsusContract::new(config).await?;
+        let state_contract = StateContract::new(config).await?;
         let gateway_contract = GatewayContract::new(config).await?;
         let portal_contract = PortalContract::new(config).await?;
 
@@ -48,13 +48,13 @@ impl WatchtowerEthereumActions {
                 match received_result {
                     Some(params) => {
                         match params.action {
-                            EthereumAction::PauseConsensus => {
-                                alerts.alert(String::from("Pausing consensus contract."), AlertLevel::Info);
-                                match consensus_contract.pause().await {
+                            EthereumAction::PauseState => {
+                                alerts.alert(String::from("Pausing state contract."), AlertLevel::Info);
+                                match state_contract.pause().await {
                                     Err(e) => alerts.alert(e.to_string(), params.alert_level),
                                     Ok(_) => {
                                         alerts.alert(
-                                            String::from("Successfully paused consensus contract."),
+                                            String::from("Successfully paused state contract."),
                                             AlertLevel::Info,
                                         );
                                     }
@@ -86,11 +86,11 @@ impl WatchtowerEthereumActions {
                             }
                             EthereumAction::PauseAll => {
                                 alerts.alert(String::from("Pausing all contracts."), AlertLevel::Info);
-                                match consensus_contract.pause().await {
+                                match state_contract.pause().await {
                                     Err(e) => alerts.alert(e.to_string(), params.alert_level.clone()),
                                     Ok(_) => {
                                         alerts.alert(
-                                            String::from("Successfully paused consensus contract."),
+                                            String::from("Successfully paused state contract."),
                                             AlertLevel::Info,
                                         );
                                     }

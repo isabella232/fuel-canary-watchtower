@@ -24,7 +24,7 @@ impl EthereumChain {
         let provider = Provider::<Http>::try_from(&config.ethereum_rpc)?;
         let provider_result = provider.get_chainid().await;
         match provider_result {
-            Err(_) => Err(anyhow::anyhow!("Invalid ethereum RPC.")),
+            Err(e) => Err(anyhow::anyhow!("Invalid ethereum RPC: {e}")),
             Ok(_) => Ok(EthereumChain { provider }),
         }
     }
@@ -35,7 +35,7 @@ impl EthereumChain {
                 Ok(_) => return Ok(()),
                 Err(e) => {
                     if i == ETHEREUM_CONNECTION_RETRIES - 1 {
-                        return Err(anyhow::anyhow!("{e}"))
+                        return Err(anyhow::anyhow!("{e}"));
                     }
                 }
             }
@@ -50,22 +50,21 @@ impl EthereumChain {
                 Ok(block_result) => {
                     return match block_result {
                         Some(block) => {
-                            let last_block_timestamp = block.timestamp.as_u64() * 1000;
-                            let millis_now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() as u64;
-                            let seconds_since_last_block = if millis_now < last_block_timestamp {
-                                0
+                            let last_block_timestamp = block.timestamp.as_u64();
+                            let millis_now =
+                                (SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() as u64) / 1000;
+                            if millis_now >= last_block_timestamp {
+                                Ok((millis_now - last_block_timestamp) as u32)
                             } else {
-                                millis_now - last_block_timestamp
-                            };
-                            let seconds_since_last_block = (seconds_since_last_block / 1000) as u32;
-                            Ok(seconds_since_last_block)
+                                Err(anyhow::anyhow!("Block time is ahead of current time"))
+                            }
                         }
                         None => Err(anyhow::anyhow!("Failed to get latest block")),
                     }
                 }
                 Err(e) => {
                     if i == ETHEREUM_CONNECTION_RETRIES - 1 {
-                        return Err(anyhow::anyhow!("{e}"))
+                        return Err(anyhow::anyhow!("{e}"));
                     }
                 }
             }
@@ -79,7 +78,7 @@ impl EthereumChain {
                 Ok(num) => return Ok(num.as_u64()),
                 Err(e) => {
                     if i == ETHEREUM_CONNECTION_RETRIES - 1 {
-                        return Err(anyhow::anyhow!("{e}"))
+                        return Err(anyhow::anyhow!("{e}"));
                     }
                 }
             }
@@ -93,7 +92,7 @@ impl EthereumChain {
                 Ok(balance) => return Ok(balance),
                 Err(e) => {
                     if i == ETHEREUM_CONNECTION_RETRIES - 1 {
-                        return Err(anyhow::anyhow!("{e}"))
+                        return Err(anyhow::anyhow!("{e}"));
                     }
                 }
             }

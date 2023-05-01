@@ -4,7 +4,7 @@ use crate::fuel_watcher::fuel_chain::FuelChain;
 use crate::WatchtowerConfig;
 
 use anyhow::Result;
-use consensus_contract::ConsesnsusContract;
+use state_contract::StateContract;
 use ethereum_chain::EthereumChain;
 use gateway_contract::GatewayContract;
 use portal_contract::PortalContract;
@@ -13,7 +13,7 @@ use std::thread;
 use std::time::Duration;
 use tokio::task::JoinHandle;
 
-pub mod consensus_contract;
+pub mod state_contract;
 pub mod ethereum_chain;
 pub mod gateway_contract;
 pub mod portal_contract;
@@ -31,7 +31,7 @@ pub async fn start_ethereum_watcher(
 ) -> Result<JoinHandle<()>> {
     let fuel_chain = FuelChain::new(config).await?;
     let ethereum_chain = EthereumChain::new(config).await?;
-    let consensus_contract = ConsesnsusContract::new(config).await?;
+    let state_contract = StateContract::new(config).await?;
     let gateway_contract = GatewayContract::new(config).await?;
     let portal_contract = PortalContract::new(config).await?;
 
@@ -136,31 +136,31 @@ pub async fn start_ethereum_watcher(
                 }
 
                 // check invalid commits
-                if watch_config.consensus_invalid_commit_alert.alert_level != AlertLevel::None {
-                    match consensus_contract.get_latest_commits(last_commit_check_block).await {
+                if watch_config.invalid_state_commit_alert.alert_level != AlertLevel::None {
+                    match state_contract.get_latest_commits(last_commit_check_block).await {
                         Ok(hashes) => {
                             for hash in hashes {
                                 match fuel_chain.verify_block_commit(&hash).await {
                                     Ok(valid) => {
                                         if !valid {
                                             alerts.alert(
-                                                format!("An invalid commit was made on the consensus contract. Hash: {hash}"),
-                                                watch_config.consensus_invalid_commit_alert.alert_level.clone(),
+                                                format!("An invalid commit was made on the state contract. Hash: {hash}"),
+                                                watch_config.invalid_state_commit_alert.alert_level.clone(),
                                             );
                                             actions.action(
-                                                watch_config.consensus_invalid_commit_alert.alert_action.clone(),
-                                                Some(watch_config.consensus_invalid_commit_alert.alert_level.clone()),
+                                                watch_config.invalid_state_commit_alert.alert_action.clone(),
+                                                Some(watch_config.invalid_state_commit_alert.alert_level.clone()),
                                             );
                                         }
                                     }
                                     Err(e) => {
                                         alerts.alert(
-                                            format!("Failed to check consensus contract commits: {e}"),
-                                            watch_config.consensus_invalid_commit_alert.alert_level.clone(),
+                                            format!("Failed to check state contract commits: {e}"),
+                                            watch_config.invalid_state_commit_alert.alert_level.clone(),
                                         );
                                         actions.action(
-                                            watch_config.consensus_invalid_commit_alert.alert_action.clone(),
-                                            Some(watch_config.consensus_invalid_commit_alert.alert_level.clone()),
+                                            watch_config.invalid_state_commit_alert.alert_action.clone(),
+                                            Some(watch_config.invalid_state_commit_alert.alert_level.clone()),
                                         );
                                     }
                                 }
@@ -168,12 +168,12 @@ pub async fn start_ethereum_watcher(
                         }
                         Err(e) => {
                             alerts.alert(
-                                format!("Failed to check consensus contract commits: {e}"),
-                                watch_config.consensus_invalid_commit_alert.alert_level.clone(),
+                                format!("Failed to check state contract commits: {e}"),
+                                watch_config.invalid_state_commit_alert.alert_level.clone(),
                             );
                             actions.action(
-                                watch_config.consensus_invalid_commit_alert.alert_action.clone(),
-                                Some(watch_config.consensus_invalid_commit_alert.alert_level.clone()),
+                                watch_config.invalid_state_commit_alert.alert_action.clone(),
+                                Some(watch_config.invalid_state_commit_alert.alert_level.clone()),
                             );
                         }
                     }
@@ -190,6 +190,7 @@ pub async fn start_ethereum_watcher(
                         let time_frame = portal_deposit_alert.time_frame;
                         match portal_contract.get_amount_deposited(time_frame, latest_block).await {
                             Ok(amount) => {
+                                println!("Total ETH deposited: {:?}", amount);
                                 let amount_threshold = EthereumChain::get_value(portal_deposit_alert.amount, 18);
                                 if amount >= amount_threshold {
                                     alerts.alert(
@@ -232,6 +233,7 @@ pub async fn start_ethereum_watcher(
                             .await
                         {
                             Ok(amount) => {
+                                println!("Total Tokens deposited: {:?}", amount);
                                 let amount_threshold = EthereumChain::get_value(
                                     gateway_deposit_alert.amount,
                                     gateway_deposit_alert.token_decimals,

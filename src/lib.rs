@@ -19,7 +19,7 @@ pub async fn run(config: &WatchtowerConfig) -> Result<()> {
         return Err(anyhow::anyhow!(
             "Failed to setup alerts: {}",
             alerts_result.err().unwrap()
-        ))
+        ));
     }
     let alerts = alerts_result.unwrap();
 
@@ -29,7 +29,7 @@ pub async fn run(config: &WatchtowerConfig) -> Result<()> {
         return Err(anyhow::anyhow!(
             "Failed to setup actions: {}",
             actions_result.err().unwrap()
-        ))
+        ));
     }
     let actions = actions_result.unwrap();
 
@@ -39,7 +39,7 @@ pub async fn run(config: &WatchtowerConfig) -> Result<()> {
         return Err(anyhow::anyhow!(
             "Failed to start fuel watcher: {}",
             fuel_watcher_result.err().unwrap()
-        ))
+        ));
     }
     let fuel_thread = fuel_watcher_result.unwrap();
 
@@ -49,7 +49,7 @@ pub async fn run(config: &WatchtowerConfig) -> Result<()> {
         return Err(anyhow::anyhow!(
             "Failed to start ethereum watcher: {}",
             ethereum_watcher_result.err().unwrap()
-        ))
+        ));
     }
     let ethereum_thread = ethereum_watcher_result.unwrap();
 
@@ -57,14 +57,14 @@ pub async fn run(config: &WatchtowerConfig) -> Result<()> {
     match ethereum_thread.await {
         Err(e) => {
             alerts.alert(String::from("Ethereum watcher thread failed."), AlertLevel::Error);
-            return Err(anyhow::anyhow!("Ethereum watcher thread failed: {}", e))
+            return Err(anyhow::anyhow!("Ethereum watcher thread failed: {}", e));
         }
         Ok(_) => {}
     }
     match fuel_thread.await {
         Err(e) => {
             alerts.alert(String::from("Fuel watcher thread failed."), AlertLevel::Error);
-            return Err(anyhow::anyhow!("Fuel watcher thread failed: {}", e))
+            return Err(anyhow::anyhow!("Fuel watcher thread failed: {}", e));
         }
         Ok(_) => {}
     }

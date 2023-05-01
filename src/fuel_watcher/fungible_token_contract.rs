@@ -12,14 +12,8 @@ impl FungibleTokenContract {
         Ok(FungibleTokenContract {})
     }
 
-    pub async fn get_amount_withdrawn(
-        &self,
-        timeframe: u32,
-        token_address: &str,
-        latest_block_num: u64,
-    ) -> Result<u64> {
+    pub async fn get_amount_withdrawn(&self, timeframe: u32, token_address: &str) -> Result<u64> {
         let block_offset = timeframe as u64 / FUEL_BLOCK_TIME;
-        let start_block = max(latest_block_num, block_offset) - block_offset;
         // TODO
 
         Ok(0)

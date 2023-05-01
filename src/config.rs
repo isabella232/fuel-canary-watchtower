@@ -11,7 +11,7 @@ pub static PRIVATE_KEY_ENV_VAR: &str = "WATCHTOWER_ETH_PRIVATE_KEY";
 pub struct WatchtowerConfig {
     pub fuel_graphql: String,
     pub ethereum_rpc: String,
-    pub consenses_contract_address: String,
+    pub state_contract_address: String,
     pub portal_contract_address: String,
     pub gateway_contract_address: String,
     pub ethereum_wallet_key: Option<String>,
@@ -33,7 +33,7 @@ pub struct EthereumClientWatcher {
     pub connection_alert: GenericAlert,
     pub block_production_alert: BlockProductionAlert,
     pub account_funds_alert: AccountFundsAlert,
-    pub consensus_invalid_commit_alert: GenericAlert,
+    pub invalid_state_commit_alert: GenericAlert,
     pub portal_deposit_alerts: Vec<DepositAlert>,
     pub gateway_deposit_alerts: Vec<DepositAlert>,
 }
